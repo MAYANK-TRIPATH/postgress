@@ -24,35 +24,72 @@
 
 // Create a function that lets you INSERT a data in a table.
 
+// import { Client } from 'pg';
+
+// const client = new Client({
+//     connectionString: "link"
+// })
+
+// //async function to insert data into a table
+// async function insertData() {
+//     const client = new Client({
+//         host: 'localhost',
+//         port: 5432,
+//         database: 'postgres',
+//         user: 'postgres',
+//         password: 'mysecretpassword',
+//     });
+
+//     try {
+//         await client.connect();
+//         const insertQuery = `
+//         INSERT INTO users (username, email, password)
+//         VALUES ('username2', 'user3@gmail.com', 'user_password');
+//         `;
+//         const res = await client.query(insertQuery);
+//         console.log('Insert success:', res); // Output insert result
+//     } catch (err) {
+//         console.error('Error during the insertion:', err);
+//     } finally {
+//         await client.end();
+//     }
+// }
+
+// insertData();
+
+
+// Function getUser that lets you fetch data from the database given in email as input.
+
 import { Client } from 'pg';
 
-const client = new Client({
-    connectionString: "link"
-})
-
-//async function to insert data into a table
-async function insertData(email: string) {
+async function getUser(email: string) {
     const client = new Client({
         host: 'localhost',
         port: 5432,
-        database: 'postgres',
-        user: 'postgres',
-        password: 'mysecretpassword',
-    });
+        database: 'posrgres',
+        user: 'Mayank',
+        password: 'password'
+    })
 
     try {
         await client.connect();
-        const insertQuery = `
-        INSERT INTO users (username, email, password)
-        VALUES ('username2', 'user3@gmail.com', 'user_password');
-        `;
-        const res = await client.query(insertQuery);
-        console.log('Insert success:', res);
+        const query = `SELECT * FROM users WHERE email = $1`
+        const values = [email];
+        const result = await client.query(query, values);
+
+        if (result.rows.length > 0) {
+            console.log('User found:', result.rows[0]); // Output user data
+            return result.rows[0]; // return the user data
+        } else {
+            console.log('No user found with the given email.');
+            return null; // return null if no user was found
+        }
     } catch (err) {
-        console.error('Error during the insertion:', err);
+        console.error('Error during fetching user:', err);
+        throw err; // Rethrow or handle error appropriately
     } finally {
-        await client.end();
+        await client.end();  // Close client connection
     }
 }
 
-insertData();
+getUser('user5@gmail.com').catch(console.error);
